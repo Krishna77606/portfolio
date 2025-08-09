@@ -8,7 +8,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        /* Enhanced responsive base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
         .hero-gradient { background: linear-gradient(135deg, #fef3c7 0%, #fde047 50%, #14b8a6 100%); }
         .profile-gradient { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
         .flop-gradient { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
@@ -69,8 +95,48 @@
                 transform: translateY(0);
             }
         }
+        
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+                background-color: #10b981;
+            }
+            50% {
+                transform: scale(1.05);
+                background-color: #059669;
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                background-color: #10b981;
+            }
+        }
+        
+        @keyframes checkmark {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(45deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(45deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(45deg);
+            }
+        }
+        
         .animate-fade-in {
             animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-success {
+            animation: successPulse 0.8s ease-in-out;
+        }
+        
+        .animate-checkmark {
+            animation: checkmark 0.6s ease-out;
         }
         .animate-delay-1 {
             animation-delay: 0.1s;
@@ -90,24 +156,25 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 p-6">
-    <div class="max-w-7xl mx-auto">
+<body class="min-h-screen bg-gray-100 p-3 sm:p-4 md:p-6">
+    <div class="max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
         <!-- Header -->
-        <header class="flex items-center justify-between mb-8">
+        <header class="flex items-center justify-between mb-4 sm:mb-6 md:mb-8">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                     <span class="text-black text-sm font-semibold">KM</span>
                 </div>
             </div>
             <nav class="flex items-center">
-                <a href="#contact" class="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-yellow-500 transition-colors button-hover">
-                    Connect with me
-                </a>
+                <button id="contactBtnDesktop" class="bg-yellow-400 text-gray-900 px-4 sm:px-6 py-2 rounded-full font-medium hover:bg-yellow-500 transition-colors button-hover text-sm sm:text-base">
+                    <span class="hidden sm:inline">Connect with me</span>
+                    <span class="sm:hidden">Connect</span>
+                </button>
             </nav>
         </header>
-
+            
         <!-- Bento Grid Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 auto-rows-[200px]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 auto-rows-[180px] sm:auto-rows-[200px] md:auto-rows-[220px]">
             <!-- Main Hero Card - Large -->
             <div class="md:col-span-2 lg:col-span-3 xl:col-span-4 row-span-2 hero-gradient rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 relative overflow-hidden flex flex-col animate-fade-in">
                 <div class="relative z-10 flex-1">
@@ -124,13 +191,88 @@
                                         
                 </div>
                 <div class="relative z-10 mt-auto">
+                    <!-- Contact Form Modal -->
+                    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 sm:p-6 lg:p-8">
+                        <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md sm:max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+                            <!-- Header -->
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">Get In Touch</h3>
+                                    <p class="text-gray-600 text-sm sm:text-base">Let's start a conversation</p>
+                                </div>
+                                <button id="closeModal" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-all duration-200">
+                                    <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Form -->
+                            <form id="contactForm" action="https://formspree.io/f/movlyvqz" method="POST" class="space-y-5">
+                                <!-- Name Field -->
+                                <div class="space-y-2">
+                                    <label for="name" class="block text-sm font-semibold text-gray-700">Full Name</label>
+                                    <div class="relative">
+                                        <input type="text" id="name" name="name" required 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                                               placeholder="Enter your full name">
+                                        <i data-lucide="user" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Email Field -->
+                                <div class="space-y-2">
+                                    <label for="email" class="block text-sm font-semibold text-gray-700">Email Address</label>
+                                    <div class="relative">
+                                        <input type="email" id="email" name="email" required 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                                               placeholder="your.email@example.com">
+                                        <i data-lucide="mail" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subject Field -->
+                                <div class="space-y-2">
+                                    <label for="subject" class="block text-sm font-semibold text-gray-700">Subject</label>
+                                    <div class="relative">
+                                        <input type="text" id="subject" name="subject" required 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                                               placeholder="What's this about?">
+                                        <i data-lucide="tag" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Message Field -->
+                                <div class="space-y-2">
+                                    <label for="message" class="block text-sm font-semibold text-gray-700">Message</label>
+                                    <div class="relative">
+                                        <textarea id="message" name="message" rows="4" required 
+                                                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500 resize-none"
+                                                  placeholder="Tell me about your project or just say hello..."></textarea>
+                                        <i data-lucide="message-circle" class="absolute right-3 top-4 w-5 h-5 text-gray-400"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="pt-2">
+                                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center gap-2">
+                                        <i data-lucide="send" class="w-5 h-5"></i>
+                                        <span>Send Message</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- Footer Note -->
+                                <div class="text-center pt-2">
+                                    <p class="text-xs text-gray-500">I'll get back to you within 24 hours</p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Mobile Layout -->
                     <div class="md:hidden space-y-4">
-                        <button class="w-full bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors button-hover text-center">
+                        <button id="contactBtnMobile" class="w-full bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors button-hover text-center">
                             Contact me
                         </button>
                         <div class="flex items-center justify-center gap-3">
-
                             <a href="https://instagram.com/rollno21.dev" target="_blank" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors icon-hover">
                                 <i data-lucide="instagram" class="w-4 h-4 text-gray-700"></i>
                             </a>
@@ -144,11 +286,10 @@
                     </div>
                     <!-- Desktop Layout -->
                     <div class="hidden md:flex items-center gap-4">
-                        <button class="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors button-hover">
+                        <button id="contactBtnDesktop" class="bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors button-hover">
                             Contact me
                         </button>
                         <div class="flex items-center gap-3">
-
                             <a href="https://instagram.com/rollno21.dev" target="_blank" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors icon-hover">
                                 <i data-lucide="instagram" class="w-5 h-5 text-gray-700"></i>
                             </a>
@@ -1146,10 +1287,10 @@
                                 <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
                                 <span class="text-sm text-green-700 font-medium">Ready to start immediately</span>
                             </div>
-                            <a href="mailto:gokarnkark06@gmail.com?subject=Freelance Project Inquiry" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
+                            <button id="connectBtnFooter" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2">
                                 <i data-lucide="mail" class="w-4 h-4"></i>
                                 Connect
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1167,6 +1308,119 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // Contact Form Modal Functionality
+        const contactModal = document.getElementById('contactModal');
+        const modalContent = document.getElementById('modalContent');
+        const contactBtnMobile = document.getElementById('contactBtnMobile');
+        const contactBtnDesktop = document.getElementById('contactBtnDesktop');
+        const connectBtnFooter = document.getElementById('connectBtnFooter');
+        const closeModal = document.getElementById('closeModal');
+        const contactForm = document.getElementById('contactForm');
+
+        // Function to open modal with animation
+        function openContactModal() {
+            contactModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            // Trigger animation after a brief delay
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // Function to close modal with animation
+        function closeContactModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                contactModal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Open modal when contact buttons are clicked
+        contactBtnMobile.addEventListener('click', openContactModal);
+        contactBtnDesktop.addEventListener('click', openContactModal);
+        connectBtnFooter.addEventListener('click', openContactModal);
+
+        // Close modal when X button is clicked
+        closeModal.addEventListener('click', closeContactModal);
+
+        // Close modal when clicking outside the form
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                closeContactModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !contactModal.classList.contains('hidden')) {
+                closeContactModal();
+            }
+        });
+
+        // Handle form submission
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(contactForm);
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            const originalHTML = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Success with animations
+                    submitBtn.innerHTML = '<i data-lucide="check" class="w-5 h-5 animate-checkmark"></i><span>Message Sent!</span>';
+                    submitBtn.classList.add('animate-success');
+                    submitBtn.style.backgroundColor = '#10b981';
+                    
+                    // Re-initialize Lucide icons for the new checkmark
+                    lucide.createIcons();
+                    
+                    contactForm.reset();
+                    
+                    setTimeout(() => {
+                        closeContactModal();
+                        submitBtn.innerHTML = originalHTML;
+                        submitBtn.classList.remove('animate-success');
+                        submitBtn.style.backgroundColor = '';
+                        submitBtn.disabled = false;
+                        
+                        // Re-initialize Lucide icons for the original content
+                        lucide.createIcons();
+                    }, 2000);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                // Error
+                submitBtn.textContent = 'Error - Try Again';
+                submitBtn.style.backgroundColor = '#ef4444';
+                
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.style.backgroundColor = '';
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
     </script>
 </body>
 </html>
